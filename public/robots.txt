@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://modelhub-ai.vercel.app/sitemap.xml

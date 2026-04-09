@@ -153,48 +153,6 @@ export default function HomePage() {
       </section>
 
       <section className="mt-16">
-        <div className="mb-8">
-          <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">Use Cases & Tutorials</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">How top operators use ModelHub</h2>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              title: "Coding & Debugging",
-              desc: "Compare Claude's logic vs GPT-5's syntax on the same gnarly bug.",
-              icon: "💻",
-              link: "/blog/claude-vs-gpt5-coding-2026",
-            },
-            {
-              title: "Marketing Copy",
-              desc: "Generate 50 ad hooks with Gemini, refine the best 5 with Claude.",
-              icon: "✍️",
-              link: "/blog/best-llm-for-marketing-copy-2026",
-            },
-            {
-              title: "Data Analysis",
-              desc: "Upload CSVs to Claude for deep reasoning, use Gemini for chart viz.",
-              icon: "📊",
-              link: "/blog/gemini-pro-vs-claude-for-data-analysis",
-            },
-            {
-              title: "AI Agent Building",
-              desc: "Test structured JSON outputs across all major function-calling models.",
-              icon: "🤖",
-              link: "/blog/building-agents-which-model-has-best-tool-calling",
-            },
-          ].map((useCase) => (
-            <Link key={useCase.title} href={useCase.link} className="group rounded-[2rem] border border-white/10 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-cyan-400/50 flex flex-col h-full">
-              <div className="text-3xl mb-4">{useCase.icon}</div>
-              <h3 className="text-xl font-semibold text-white group-hover:text-cyan-300 transition-colors">{useCase.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-300 flex-grow">{useCase.desc}</p>
-              <div className="mt-6 text-sm font-medium text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity">Read tutorial →</div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-16">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">Pricing</p>
