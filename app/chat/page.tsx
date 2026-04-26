@@ -1,9 +1,14 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { AcquisitionTracker } from "@/components/AcquisitionTracker";
 import { ChatInterface } from "@/components/ChatInterface";
 
 export default function ChatPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-10 md:px-10">
+      <Suspense fallback={null}>
+        <AcquisitionTracker />
+      </Suspense>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">Chat</p>
@@ -15,7 +20,9 @@ export default function ChatPage() {
           <Link href="/pricing">Pricing</Link>
         </div>
       </div>
-      <ChatInterface />
+      <Suspense fallback={null}>
+        <ChatInterface />
+      </Suspense>
     </main>
   );
 }

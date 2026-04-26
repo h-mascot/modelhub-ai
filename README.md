@@ -29,6 +29,17 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Analytics
+
+Optional privacy-friendly analytics can be enabled with:
+
+```bash
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=modelhub-ai.vercel.app
+NEXT_PUBLIC_PLAUSIBLE_SRC=https://plausible.io/js/script.js
+```
+
+If these vars are omitted, analytics stays off.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

@@ -44,6 +44,9 @@ export function PricingCard({
       </ul>
       <a
         href={href}
+        data-analytics-event="pricing_click"
+        data-analytics-location="pricing_card"
+        data-analytics-label={name.toLowerCase()}
         className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-white px-5 py-3 font-medium text-slate-950 transition hover:opacity-90"
       >
         {cta}

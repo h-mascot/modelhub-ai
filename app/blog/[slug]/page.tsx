@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArticleTracker } from "@/components/ArticleTracker";
 import { getAllPosts, getPostBySlug } from "@/lib/blog";
+
+function buildComparisonPrompt(title: string, category: string) {
+  return `I need to choose the best AI model for this task: ${title}. Compare the strengths, weaknesses, and ideal use case for each answer, then recommend the better model for a ${category.toLowerCase()} workflow.`;
+}
 
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({ slug: post.slug }));
@@ -30,9 +35,7 @@ export function generateMetadata({
         type: "article",
         publishedTime: post.date,
         authors: ["ModelHub AI"],
-        tags: (post.content.match(/tags:\s*"?([^"\n]+)"?/) || [])[1]
-          ?.split(",")
-          .map((t: string) => t.trim()),
+        tags: post.tags,
       },
       twitter: {
         card: "summary_large_image",
@@ -62,15 +65,11 @@ export default async function BlogPostPage({
     .split("\n\n")
     .map((block) => block.trim())
     .filter(Boolean);
-
-  // Extract tags from frontmatter for display
-  const tagsMatch = post.content.match(/^tags:\s*"?([^"\n]+)"?/);
-  const tags = tagsMatch
-    ? tagsMatch[1].split(",").map((t) => t.trim())
-    : [];
+  const comparisonPrompt = buildComparisonPrompt(post.title, post.category);
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 md:px-10">
+      <ArticleTracker slug={post.slug} category={post.category} intent={post.intent} />
       <Link href="/blog" className="text-sm text-slate-300 hover:text-white">
         ← Back to blog
       </Link>
@@ -80,9 +79,9 @@ export default async function BlogPostPage({
           <span>•</span>
           <span>{post.readTime}</span>
         </div>
-        {tags.length > 0 && (
+        {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {tags.map((tag) => (
+            {post.tags.map((tag) => (
               <span
                 key={tag}
                 className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300"
@@ -118,17 +117,28 @@ export default async function BlogPostPage({
         {/* CTA after article */}
         <div className="mt-12 rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-8 text-center">
           <h3 className="text-xl font-semibold text-white">
-            Try comparing models yourself — free
+            Run this decision in Compare mode
           </h3>
           <p className="mt-2 text-sm text-slate-300">
-            Stop guessing which AI is best. Prompt them both side by side on
-            ModelHub AI.
+            Land on a prefilled comparison instead of a blank box, then adjust the prompt for your exact use case.
           </p>
           <Link
-            href="/chat"
+            href={{
+              pathname: "/compare",
+              query: {
+                prompt: comparisonPrompt,
+                source: "blog",
+                article: post.slug,
+                intent: post.intent,
+                cta: post.cta,
+              },
+            }}
+            data-analytics-event="article_cta_click"
+            data-analytics-location="blog_post_cta"
+            data-analytics-label={post.slug}
             className="mt-4 inline-block rounded-2xl bg-white px-6 py-3 font-medium text-slate-950 transition hover:opacity-90"
           >
-            Start chatting free
+            Open prefilled comparison
           </Link>
         </div>
 

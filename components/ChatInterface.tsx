@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { MessageBubble } from "@/components/MessageBubble";
 import { ModelSelector } from "@/components/ModelSelector";
 import { DEFAULT_MODEL, MODELS, type ModelId } from "@/lib/models";
@@ -18,6 +19,18 @@ type Props = {
 
 const STORAGE_KEY = "modelhub-history";
 
+const CHAT_STARTERS = [
+  "Summarize this meeting transcript into decisions, risks, and next steps.",
+  "Rewrite this email to sound clearer, warmer, and more persuasive without getting longer.",
+  "Turn these rough notes into a crisp strategy memo with recommendations and tradeoffs.",
+];
+
+const COMPARE_STARTERS = [
+  "Compare how each model would write a launch email for a new B2B SaaS feature. Call out which answer is stronger and why.",
+  "Compare how each model would debug a failing API request and explain the likely root cause step by step.",
+  "Compare how each model would summarize customer interview notes into patterns, quotes, and product recommendations.",
+];
+
 function createWelcomeMessage(model: string): Message {
   return {
     id: crypto.randomUUID(),
@@ -29,6 +42,7 @@ function createWelcomeMessage(model: string): Message {
 }
 
 export function ChatInterface({ compare = false }: Props) {
+  const searchParams = useSearchParams();
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL);
   const [compareModel, setCompareModel] = useState<ModelId>("minimax");
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -49,10 +63,18 @@ export function ChatInterface({ compare = false }: Props) {
   });
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const samplePrompt = searchParams.get("prompt")?.trim() || "";
+  const starterPrompts = compare ? COMPARE_STARTERS : CHAT_STARTERS;
   const modelName = useMemo(
     () => MODELS.find((item) => item.id === model)?.name || model,
     [model],
   );
+
+  useEffect(() => {
+    if (!samplePrompt) return;
+
+    setPrompt((currentPrompt) => (currentPrompt.trim().length > 0 ? currentPrompt : samplePrompt));
+  }, [samplePrompt]);
 
   const persistMessages = (nextMessages: Message[]) => {
     setMessages(nextMessages);
@@ -177,11 +199,44 @@ export function ChatInterface({ compare = false }: Props) {
         ))}
       </div>
 
-      <div className="mt-6 space-y-3">
+      <form
+        className="mt-6 space-y-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void sendPrompt();
+        }}
+        data-analytics-submit-event={compare ? "compare_submit" : "chat_submit"}
+        data-analytics-location={compare ? "modelhub_compare" : "modelhub_chat"}
+        data-analytics-label={compare ? "compare_answers" : "send_message"}
+      >
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+              {compare ? "Starter comparisons" : "Starter prompts"}
+            </p>
+            {samplePrompt ? (
+              <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[11px] text-cyan-200">
+                Prefilled from article
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {starterPrompts.map((starter) => (
+              <button
+                key={starter}
+                type="button"
+                onClick={() => setPrompt(starter)}
+                className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-slate-200 transition hover:border-cyan-400/50 hover:text-white"
+              >
+                {starter}
+              </button>
+            ))}
+          </div>
+        </div>
         <textarea
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
-          placeholder="Ask ModelHub anything…"
+          placeholder={compare ? "Paste the task you want to compare across models…" : "Ask ModelHub anything…"}
           className="min-h-32 w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-4 text-slate-100 outline-none transition focus:border-cyan-400"
         />
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -189,14 +244,17 @@ export function ChatInterface({ compare = false }: Props) {
             Live now: GLM-5, GLM-4, MiniMax. OpenAI and Anthropic are visible in UI for upcoming rollout.
           </p>
           <button
-            onClick={sendPrompt}
+            type="submit"
+            data-analytics-event={compare ? "cta_click" : "cta_click"}
+            data-analytics-location={compare ? "modelhub_compare" : "modelhub_chat"}
+            data-analytics-label={compare ? "compare_answers" : "send_message"}
             disabled={loading}
             className="rounded-2xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Thinking…" : compare ? "Compare answers" : "Send message"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

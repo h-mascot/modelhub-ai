@@ -7,6 +7,10 @@ export type BlogPost = {
   description: string;
   date: string;
   readTime: string;
+  tags: string[];
+  category: string;
+  intent: string;
+  cta: string;
   content: string;
 };
 
@@ -48,6 +52,13 @@ export function getAllPosts(): BlogPost[] {
         description: String(data.description || ""),
         date: String(data.date || ""),
         readTime: String(data.readTime || "5 min read"),
+        tags: String(data.tags || "")
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        category: String(data.category || "General"),
+        intent: String(data.intent || "middle_of_funnel"),
+        cta: String(data.cta || "start_free"),
         content,
       };
     })

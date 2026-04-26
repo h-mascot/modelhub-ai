@@ -53,7 +53,7 @@ export default function PricingPage() {
             Pick the plan that matches your prompt volume.
           </h1>
           <p className="mt-3 max-w-2xl text-slate-300">
-            Cancel anytime. No lock-in. Start free and upgrade when you're ready.
+            Cancel anytime. No lock-in. Start free and upgrade when you&apos;re ready.
           </p>
         </div>
         <Link href="/" className="text-sm text-slate-300 hover:text-white">
@@ -207,6 +207,9 @@ export default function PricingPage() {
         </p>
         <Link
           href="/chat"
+          data-analytics-event="cta_click"
+          data-analytics-location="modelhub_pricing_final_cta"
+          data-analytics-label="launch_chat"
           className="mt-4 inline-block rounded-2xl bg-white px-6 py-3 font-medium text-slate-950 transition hover:opacity-90"
         >
           Launch chat

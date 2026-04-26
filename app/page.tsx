@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { PricingCard } from "@/components/PricingCard";
+import { SavingsCalculator } from "@/components/SavingsCalculator";
 import { MODELS } from "@/lib/models";
+
+const homepageComparisonPrompt = "Compare how two AI models would handle this task: write a clear customer update email about a delayed product launch. Show which answer is stronger and why.";
 
 const plans = [
   {
@@ -39,10 +42,10 @@ export default function HomePage() {
             ModelHub AI
           </Link>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
-            <Link href="/chat">Chat</Link>
-            <Link href="/compare">Compare</Link>
-            <Link href="/pricing">Pricing</Link>
-            <Link href="/blog">Blog</Link>
+            <Link href="/chat" data-analytics-event="cta_click" data-analytics-location="modelhub_nav" data-analytics-label="chat">Chat</Link>
+            <Link href="/compare" data-analytics-event="cta_click" data-analytics-location="modelhub_nav" data-analytics-label="compare">Compare</Link>
+            <Link href="/pricing" data-analytics-event="pricing_click" data-analytics-location="modelhub_nav" data-analytics-label="pricing">Pricing</Link>
+            <Link href="/blog" data-analytics-event="cta_click" data-analytics-location="modelhub_nav" data-analytics-label="blog">Blog</Link>
           </div>
         </nav>
 
@@ -60,12 +63,18 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/chat"
+                data-analytics-event="cta_click"
+                data-analytics-location="modelhub_hero"
+                data-analytics-label="launch_chat"
                 className="rounded-2xl bg-white px-6 py-3 font-medium text-slate-950 transition hover:opacity-90"
               >
                 Launch chat
               </Link>
               <Link
-                href="/compare"
+                href={{ pathname: "/compare", query: { prompt: homepageComparisonPrompt, source: "homepage", cta: "hero_compare" } }}
+                data-analytics-event="cta_click"
+                data-analytics-location="modelhub_hero"
+                data-analytics-label="compare_models"
                 className="rounded-2xl border border-white/10 px-6 py-3 font-medium text-slate-100 transition hover:border-cyan-400"
               >
                 Compare models
@@ -108,8 +117,58 @@ export default function HomePage() {
         ))}
       </section>
 
-      
-      
+      <section className="mt-12 rounded-[2rem] border border-cyan-400/20 bg-cyan-400/10 p-6 md:p-8">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Fastest path to value</p>
+            <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">
+              Start with one prompt. See which model actually earns a spot in your stack.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-200">
+              Most people do not need another AI subscription. They need one place to test the same task across the best models, keep the winner, and move on.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-4">
+              <Link
+                href={{ pathname: "/compare", query: { prompt: homepageComparisonPrompt, source: "homepage", cta: "midpage_compare" } }}
+                data-analytics-event="cta_click"
+                data-analytics-location="modelhub_midpage_value"
+                data-analytics-label="run_first_comparison"
+                className="rounded-2xl bg-white px-6 py-3 font-medium text-slate-950 transition hover:opacity-90"
+              >
+                Run your first comparison
+              </Link>
+              <Link
+                href="/pricing"
+                data-analytics-event="pricing_click"
+                data-analytics-location="modelhub_midpage_value"
+                data-analytics-label="see_plan_limits"
+                className="rounded-2xl border border-white/20 px-6 py-3 font-medium text-white transition hover:border-white/40"
+              >
+                See plan limits
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/60 p-5">
+            <p className="text-sm font-medium text-cyan-300">A simple buyer journey</p>
+            <div className="mt-4 space-y-3 text-sm text-slate-300">
+              {[
+                "Paste the prompt you already use for work.",
+                "Compare answers from the top models side by side.",
+                "Upgrade only if the time saved is obvious.",
+              ].map((step, index) => (
+                <div key={step} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cyan-400/20 text-xs font-semibold text-cyan-200">
+                    {index + 1}
+                  </span>
+                  <p>{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mt-16">
         <div className="mb-8">
           <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">Use Cases & Tutorials</p>
@@ -142,7 +201,7 @@ export default function HomePage() {
               link: "/blog/building-agents-which-model-has-best-tool-calling",
             },
           ].map((useCase) => (
-            <Link key={useCase.title} href={useCase.link} className="group rounded-[2rem] border border-white/10 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-cyan-400/50 flex flex-col h-full">
+            <Link key={useCase.title} href={useCase.link} data-analytics-event="cta_click" data-analytics-location="modelhub_use_cases" data-analytics-label={useCase.title.toLowerCase().replace(/[^a-z0-9]+/g, "_")} className="group rounded-[2rem] border border-white/10 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-cyan-400/50 flex flex-col h-full">
               <div className="text-3xl mb-4">{useCase.icon}</div>
               <h3 className="text-xl font-semibold text-white group-hover:text-cyan-300 transition-colors">{useCase.title}</h3>
               <p className="mt-3 text-sm leading-7 text-slate-300 flex-grow">{useCase.desc}</p>
@@ -152,13 +211,15 @@ export default function HomePage() {
         </div>
       </section>
 
+      <SavingsCalculator />
+
       <section className="mt-16">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">Pricing</p>
             <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">Simple plans for real usage</h2>
           </div>
-          <Link href="/pricing" className="text-sm text-slate-300 hover:text-white">
+          <Link href="/pricing" data-analytics-event="pricing_click" data-analytics-location="modelhub_home_pricing" data-analytics-label="view_pricing_page" className="text-sm text-slate-300 hover:text-white">
             View pricing page →
           </Link>
         </div>
@@ -166,6 +227,31 @@ export default function HomePage() {
           {plans.map((plan) => (
             <PricingCard key={plan.name} {...plan} />
           ))}
+        </div>
+      </section>
+
+      <section className="mt-24">
+        <div className="mb-8">
+          <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">From the lab</p>
+          <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">More AI Tools from Money Z</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <a href="https://websitereviewai.com" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-cyan-400/50">
+            <div className="font-semibold text-white group-hover:text-cyan-300 transition-colors text-sm">SiteInsight AI</div>
+            <p className="text-xs text-slate-400 mt-2">Get your website reviewed by AI in seconds</p>
+          </a>
+          <a href="https://contentmorph-ai-ten.vercel.app" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-cyan-400/50">
+            <div className="font-semibold text-white group-hover:text-cyan-300 transition-colors text-sm">ContentMorph AI</div>
+            <p className="text-xs text-slate-400 mt-2">Repurpose your content into any format instantly</p>
+          </a>
+          <a href="https://thumbnailforge-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-cyan-400/50">
+            <div className="font-semibold text-white group-hover:text-cyan-300 transition-colors text-sm">ThumbnailForge AI</div>
+            <p className="text-xs text-slate-400 mt-2">Generate YouTube thumbnails with AI in seconds</p>
+          </a>
+          <a href="https://emailsubject-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition-all hover:bg-white/10 hover:border-cyan-400/50">
+            <div className="font-semibold text-white group-hover:text-cyan-300 transition-colors text-sm">EmailSubject AI</div>
+            <p className="text-xs text-slate-400 mt-2">Test &amp; score email subject lines with AI</p>
+          </a>
         </div>
       </section>
     </main>
